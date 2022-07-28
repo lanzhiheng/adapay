@@ -1,8 +1,6 @@
 # Adapay
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/adapay`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Welcome to Adapay! This is a simple gem for Adapay. What is Adapay? It's an pay platform which integrating multi pay channel. So you can use Alipay, Wechat, Union, etc.
 
 ## Installation
 
@@ -22,13 +20,70 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Configuration
 
-## Development
+Create `Create config/initializer/adapay.rb` and put following configurations into it
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```
+Adapay.app_id = 'Your Adapay App Id
+Adapay.app_key = 'Your Adapay App Key'
+Adapay.backup_app_id = 'Your Backup Adapay App Id'
+Adapay.backup_app_key = 'Your Backup Adapay App Key'
+# Private key which generate by your platform
+Adapay.merchant_private_key = File.read('merchant_private_key')
+# Public Key From Adapay Platform
+Adapay.platform_public_key = File.read('adapay_platform_public_key')
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+### backup_app_id
+
+What is `backup_app_id`? Imagine, if you have more than one applications in Adapay, most of api you want to issue in application with `app_id` and others on `backup_app_id`. How to do that? You Just can call the method with params `app_id=xxxx`.
+
+### 1. Create Payment in default application
+
+``` ruby
+params = {
+  order_no: 'number',
+  pay_channel: 'alipay',
+  pay_amt: format('%.2f', 100),
+  expend: {
+    open_id: ''
+  },
+  pay_mode: 'delay',
+  goods_title: 'payment',
+  goods_desc: 'payment',
+  device_info: {
+    device_ip: '127.0.0.1'
+  },
+  notify_url: notification_url
+}
+
+res = Adapay.create_refund(params)
+```
+
+## 1. Create Payment in other application with backup_app_id
+
+``` ruby
+params = {
+  order_no: 'number',
+  pay_channel: 'alipay',
+  pay_amt: format('%.2f', 100),
+  expend: {
+    open_id: ''
+  },
+  pay_mode: 'delay',
+  goods_title: 'payment',
+  goods_desc: 'payment',
+  device_info: {
+    device_ip: '127.0.0.1'
+  },
+  notify_url: notification_url
+}
+
+res = Adapay.create_refund(params.merge(app_id: Adapay.backup_app_id))
+```
+
+This Gem can auto search the `backup_app_key` from `Adapay.id_key_map`. You can check the source code from [here](https://github.com/lanzhiheng/adapay/blob/master/lib/adapay.rb#L80).
 
 ## Contributing
 
