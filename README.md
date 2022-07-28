@@ -61,7 +61,7 @@ params = {
 res = Adapay.create_refund(params)
 ```
 
-## 1. Create Payment in other application with backup_app_id
+## 2. Create Payment in other application with backup_app_id
 
 ``` ruby
 params = {
