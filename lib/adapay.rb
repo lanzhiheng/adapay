@@ -116,6 +116,8 @@ module Adapay
     def query_refund(params)
       path = '/v1/payments/refunds'
 
+      params = { app_id: app_id }.merge(params)
+
       send_request(:get, path, params)
     end
 
