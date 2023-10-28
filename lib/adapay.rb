@@ -323,6 +323,24 @@ module Adapay
       send_request(:post, path, params)
     end
 
+    def payment_confirm_reverse(params)
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      path = '/v1/payments/confirm/reverse'
+      send_request(:post, path, params)
+    end
+
+    def query_payment_confirm_reverse_detail(params)
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      path = '/v1/payments/confirm/reverse/details'
+      send_request(:get, path, params)
+    end
+
     # https://docs.adapay.tech/api/trade.html#id59
     def query_payment_confirm(params)
       payment_confirm_id = params.delete(:payment_confirm_id)
