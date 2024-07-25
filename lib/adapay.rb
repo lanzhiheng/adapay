@@ -164,6 +164,17 @@ module Adapay
       send_request(:post, path, params)
     end
 
+    # 必填：tel_no 用户手机号 user_name 用户姓名 cert_type 00-身份证 cert_id 证件号
+    def create_realname_member(params)
+      path = '/v1/members/realname'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:post, path, params)
+    end
+
     # https://docs.adapay.tech/api/trade.html#id39
     def query_member(params)
       member_id = params.delete(:member_id)
@@ -189,10 +200,10 @@ module Adapay
     end
 
     # https://docs.adapay.tech/api/trade.html#id42
-    def query_member_list
+    def query_member_list(**params)
       path = '/v1/members/list'
 
-      params = { app_id: app_id }
+      params = { app_id: app_id }.merge(params)
 
       send_request(:get, path, params)
     end
@@ -253,6 +264,40 @@ module Adapay
 
     def query_settle_account_balance(params)
       path = '/v1/settle_accounts/balance'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:get, path, params)
+    end
+
+    # -- 余额支付
+
+    def balance_pay(params)
+      path = '/v1/settle_accounts/balancePay'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:post, path, params)
+    end
+
+    def balance_refund(params)
+      path = '/v1/settle_accounts/balanceRefund'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:post, path, params)
+    end
+
+    # Adapay.balance_pay_list({ created_gte: (Date.yesterday.beginning_of_day.to_f * 1000).to_i,
+    #                           created_lte: (Date.yesterday.end_of_day.to_f * 1000).to_i })
+    def balance_pay_list(params)
+      path = '/v1/settle_accounts/balancePayList'
 
       params = {
         app_id: app_id

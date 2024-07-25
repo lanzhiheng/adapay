@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    adapay (1.0.0)
+    adapay (1.0.1)
 
 GEM
   remote: https://rubygems.org/
