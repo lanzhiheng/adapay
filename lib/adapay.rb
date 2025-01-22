@@ -348,10 +348,10 @@ module Adapay
       send_request(:get, path, params)
     end
 
-    def query_payment_reverse_list
+    def query_payment_reverse_list(params)
       params = {
         app_id: app_id
-      }
+      }.merge(params)
 
       path = '/v1/payments/reverse/list'
       send_request(:get, path, params)
