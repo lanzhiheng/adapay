@@ -129,6 +129,15 @@ module Adapay
       send_request(:post, path, params)
     end
 
+    # 支付宝小程序跳转支付
+    def create_pre_pay_pre_order_payment(params)
+      path = '/v1/prePay/preOrder'
+
+      params = { app_id: app_id, adapay_func_code: 'prePay.preOrder' }.merge(params)
+
+      send_request(:post, path, params)
+    end
+
     def close_payment(params)
       payment_id = params.delete(:payment_id)
       path = "/v1/payments/#{payment_id}/close"
