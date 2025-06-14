@@ -6,7 +6,7 @@ RSpec.describe Adapay do
   end
 
   it 'version' do
-    expect(Adapay.sdk_version).to eq('ruby_1.0.0')
+    expect(Adapay.sdk_version).to eq('ruby_1.0.1')
   end
 
   # 验证签名算法
