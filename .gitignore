@@ -9,3 +9,27 @@
 
 # rspec failure tracking
 .rspec_status
+
+# Ruby build artifacts
+*.gem
+
+# Local environment files
+.env
+
+# Ruby version manager files
+.ruby-version
+.ruby-gemset
+
+# Local bundle configurations
+.bundle/
+
+# Gem installation directories
+vendor/bundle/
+
+# Log files
+log/
+
+# Clacky-specific files
+.1024*
+!.1024
+.breakpoints
