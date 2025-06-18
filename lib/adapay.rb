@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'adapay/version'
+require 'rest-client'
+require 'json'
 
 module Adapay
   class << self
@@ -409,6 +411,54 @@ module Adapay
       send_request(:get, path, params)
     end
 
+    # -- 企业用户
+
+    # https://docs.adapay.tech/api/trade.html#corp-member-create
+    def create_corp_member(params, attach_file = nil)
+      # Validate required parameters
+      required_fields = [:member_id, :order_no, :name]
+      if params.empty?
+        raise ArgumentError, "missing required parameters"
+      end
+
+      required_fields.each do |field|
+        unless params.key?(field)
+          raise ArgumentError, "#{field} is required"
+        end
+      end
+
+      path = '/v1/corp_members'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      if attach_file && File.exist?(attach_file)
+        headers = build_multipart_headers(endpoint + path, params)
+
+        payload = params.merge({ attach_file: File.new(attach_file, 'rb') })
+
+        RestClient::Request.execute(method: :post, url: endpoint + path,
+                                headers: headers,
+                                payload: payload)
+      else
+        send_request(:post, path, params)
+      end
+    rescue RestClient::BadRequest, RestClient::Unauthorized, RestClient::PaymentRequired, RestClient::Exception => e
+      e.response.body rescue e.response
+    end
+
+    # Query an existing corporate member
+    def query_corp_member(params)
+      path = "/v1/corp_members/#{params[:member_id]}"
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:get, path, params)
+    end
+
     private
 
     def send_request(method, path, params)
@@ -419,6 +469,16 @@ module Adapay
       RestClient::Request.execute(method: method, url: url, headers: headers, payload: params.to_json)
     rescue RestClient::BadRequest, RestClient::Unauthorized, RestClient::PaymentRequired => e
       e.response
+    end
+
+    def build_multipart_headers(url, params)
+      headers = build_common_headers(params[:app_id])
+      plain_text = url + params.to_json
+      signature = sign(plain_text)
+
+      headers.merge({
+        signature: signature
+      })
     end
 
     def get_original_str(params)
