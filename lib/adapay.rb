@@ -4,6 +4,8 @@ require 'adapay/version'
 require 'rest-client'
 require 'json'
 
+# 汇付最新文档： https://doc.adapay.tech/document/api/#/member?id=%e5%88%9b%e5%bb%ba%e4%bc%81%e4%b8%9a%e7%94%a8%e6%88%b7%e5%af%b9%e8%b1%a1
+
 module Adapay
   class << self
     attr_accessor :app_id, :app_key, :backup_app_id, :backup_app_key
