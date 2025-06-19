@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    adapay (1.0.1)
+    adapay (1.2.0)
       rest-client (~> 2.1)
 
 GEM
@@ -16,7 +16,7 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2025.0610)
+    mime-types-data (3.2025.0617)
     netrc (0.11.0)
     rake (12.3.3)
     rest-client (2.1.0)
