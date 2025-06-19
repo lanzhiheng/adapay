@@ -477,16 +477,6 @@ module Adapay
       e.response
     end
 
-    def build_multipart_headers(url, params)
-      headers = build_common_headers(params[:app_id])
-      plain_text = url + params.to_json
-      signature = sign(plain_text)
-
-      headers.merge({
-                      signature: signature
-                    })
-    end
-
     def get_original_str(params)
       params.to_a.sort.map do |a, b|
         value = b.is_a?(Hash) ? b.to_json : b
