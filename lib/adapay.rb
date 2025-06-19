@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 require 'adapay/version'
+require 'rest-client'
+require 'json'
+
+# 汇付最新文档： https://doc.adapay.tech/document/api/#/member?id=%e5%88%9b%e5%bb%ba%e4%bc%81%e4%b8%9a%e7%94%a8%e6%88%b7%e5%af%b9%e8%b1%a1
 
 module Adapay
   class << self
@@ -208,8 +212,6 @@ module Adapay
       send_request(:get, path, params)
     end
 
-    ## ---
-
     def create_settle_account(params)
       path = '/v1/settle_accounts'
 
@@ -401,6 +403,62 @@ module Adapay
 
     def query_payment_confirm_list(params)
       path = '/v1/payments/confirm/list'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:get, path, params)
+    end
+
+    def corp_picture_upload(params, attach_file)
+      required_fields = [:file_type]
+
+      raise ArgumentError, 'missing required parameters' if params.empty?
+
+      required_fields.each do |field|
+        raise ArgumentError, "#{field} is required" unless params.key?(field)
+      end
+
+      path = '/v1/corp/pictureUpload'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      # 带文件上传的接口会比较特殊：https://docs.adapay.tech/help/console.html#generatecert
+      url = endpoint + path
+      headers = build_request_info(:get, url, params)
+      url += "?#{get_original_str(params)}"
+
+      payload = { attach_file: File.new(attach_file, 'rb') }
+      RestClient::Request.execute(method: :post, url: url, headers: headers, payload: payload)
+    end
+
+    # -- 企业用户
+
+    # https://docs.adapay.tech/api/trade.html#corp-member-create
+    def create_corp_member(params)
+      # Validate required parameters
+      required_fields = %i[member_id order_no name]
+      raise ArgumentError, 'missing required parameters' if params.empty?
+
+      required_fields.each do |field|
+        raise ArgumentError, "#{field} is required" unless params.key?(field)
+      end
+
+      path = '/v1/corp/createMembers'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      send_request(:post, path, params)
+    end
+
+    # Query an existing corporate member
+    def query_corp_member(params)
+      path = "/v1/corp_members/#{params[:member_id]}"
 
       params = {
         app_id: app_id
