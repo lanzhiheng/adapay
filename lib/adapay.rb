@@ -210,8 +210,6 @@ module Adapay
       send_request(:get, path, params)
     end
 
-    ## ---
-
     def create_settle_account(params)
       path = '/v1/settle_accounts'
 
@@ -411,23 +409,43 @@ module Adapay
       send_request(:get, path, params)
     end
 
+    def corp_picture_upload(params, attach_file)
+      required_fields = [:file_type]
+
+      raise ArgumentError, 'missing required parameters' if params.empty?
+
+      required_fields.each do |field|
+        raise ArgumentError, "#{field} is required" unless params.key?(field)
+      end
+
+      path = '/v1/corp/pictureUpload'
+
+      params = {
+        app_id: app_id
+      }.merge(params)
+
+      # 带文件上传的接口会比较特殊：https://docs.adapay.tech/help/console.html#generatecert
+      url = endpoint + path
+      headers = build_request_info(:get, url, params)
+      url += "?#{get_original_str(params)}"
+
+      payload = { attach_file: File.new(attach_file, 'rb') }
+      RestClient::Request.execute(method: :post, url: url, headers: headers, payload: payload)
+    end
+
     # -- 企业用户
 
     # https://docs.adapay.tech/api/trade.html#corp-member-create
     def create_corp_member(params, attach_file = nil)
       # Validate required parameters
-      required_fields = [:member_id, :order_no, :name]
-      if params.empty?
-        raise ArgumentError, "missing required parameters"
-      end
+      required_fields = %i[member_id order_no name]
+      raise ArgumentError, 'missing required parameters' if params.empty?
 
       required_fields.each do |field|
-        unless params.key?(field)
-          raise ArgumentError, "#{field} is required"
-        end
+        raise ArgumentError, "#{field} is required" unless params.key?(field)
       end
 
-      path = '/v1/corp_members'
+      path = '/v1/corp/createMembers'
 
       params = {
         app_id: app_id
@@ -439,13 +457,11 @@ module Adapay
         payload = params.merge({ attach_file: File.new(attach_file, 'rb') })
 
         RestClient::Request.execute(method: :post, url: endpoint + path,
-                                headers: headers,
-                                payload: payload)
+                                    headers: headers,
+                                    payload: payload)
       else
         send_request(:post, path, params)
       end
-    rescue RestClient::BadRequest, RestClient::Unauthorized, RestClient::PaymentRequired, RestClient::Exception => e
-      e.response.body rescue e.response
     end
 
     # Query an existing corporate member
@@ -477,8 +493,8 @@ module Adapay
       signature = sign(plain_text)
 
       headers.merge({
-        signature: signature
-      })
+                      signature: signature
+                    })
     end
 
     def get_original_str(params)
