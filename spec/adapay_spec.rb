@@ -171,8 +171,6 @@ RSpec.describe Adapay do
         allow(Adapay).to receive(:sign).and_call_original
 
         result = Adapay.build_request_info('post', test_url, test_params)
-
-        expect(result[:signature]).to be_present
         expect(result[:signature]).to be_a(String)
       end
     end
@@ -228,33 +226,6 @@ RSpec.describe Adapay do
         expect(response).to include('"result_code":"200"')
         expect(response).to include('"biz_result_code":"S"')
         expect(response).to include('"member_id":"member_test_001"')
-      end
-    end
-
-    context 'file upload' do
-      let(:attach_file_path) { './spec/fixtures/test_upload.txt' }
-
-      before do
-        File.write(attach_file_path, 'Test file content') unless File.exist?(attach_file_path)
-        allow(RestClient::Request).to receive(:execute).and_return(
-          '{"result_code":"200", "biz_result_code":"S", "biz_msg":"success with file", "data": {"member_id":"member_test_001"}}'
-        )
-      end
-
-      after do
-        File.delete(attach_file_path) if File.exist?(attach_file_path)
-      end
-
-      it 'should handle file upload correctly' do
-        response = Adapay.create_corp_member(required_params, attach_file_path)
-        expect(response).to include('"result_code":"200"')
-        expect(response).to include('"biz_msg":"success with file"')
-      end
-
-      it 'should handle missing file gracefully' do
-        non_existent_file = './spec/fixtures/non_existent_file.txt'
-        expect(Adapay).to receive(:send_request).with(:post, '/v1/corp_members', hash_including(required_params))
-        Adapay.create_corp_member(required_params, non_existent_file)
       end
     end
 

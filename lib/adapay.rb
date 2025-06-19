@@ -436,7 +436,7 @@ module Adapay
     # -- 企业用户
 
     # https://docs.adapay.tech/api/trade.html#corp-member-create
-    def create_corp_member(params, attach_file = nil)
+    def create_corp_member(params)
       # Validate required parameters
       required_fields = %i[member_id order_no name]
       raise ArgumentError, 'missing required parameters' if params.empty?
@@ -451,17 +451,7 @@ module Adapay
         app_id: app_id
       }.merge(params)
 
-      if attach_file && File.exist?(attach_file)
-        headers = build_multipart_headers(endpoint + path, params)
-
-        payload = params.merge({ attach_file: File.new(attach_file, 'rb') })
-
-        RestClient::Request.execute(method: :post, url: endpoint + path,
-                                    headers: headers,
-                                    payload: payload)
-      else
-        send_request(:post, path, params)
-      end
+      send_request(:post, path, params)
     end
 
     # Query an existing corporate member
