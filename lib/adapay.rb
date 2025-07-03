@@ -133,6 +133,15 @@ module Adapay
       send_request(:post, path, params)
     end
 
+    # 支付宝小程序跳转支付
+    def create_pre_pay_pre_order_payment(params)
+      path = '/v1/prePay/preOrder'
+
+      params = { app_id: app_id, adapay_func_code: 'prePay.preOrder' }.merge(params)
+
+      send_page_request(:post, path, params)
+    end
+
     def close_payment(params)
       payment_id = params.delete(:payment_id)
       path = "/v1/payments/#{payment_id}/close"
@@ -471,6 +480,16 @@ module Adapay
 
     def send_request(method, path, params)
       url = endpoint + path
+      headers = build_request_info(method, url, params)
+      url += "?#{get_original_str(params)}" if method.downcase.to_s == 'get'
+
+      RestClient::Request.execute(method: method, url: url, headers: headers, payload: params.to_json)
+    rescue RestClient::BadRequest, RestClient::Unauthorized, RestClient::PaymentRequired => e
+      e.response
+    end
+
+    def send_page_request(method, path, params)
+      url = page_endpoint + path
       headers = build_request_info(method, url, params)
       url += "?#{get_original_str(params)}" if method.downcase.to_s == 'get'
 
