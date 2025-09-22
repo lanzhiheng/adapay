@@ -145,10 +145,12 @@ module Adapay
       send_request(:post, path, params)
     end
 
-    def query_payment_list
-      path = '/v1/payments/list'
+    def query_payment_list(params)
+      params = {
+        app_id: app_id
+      }.merge(params)
 
-      params = { app_id: app_id }
+      path = '/v1/payments/list'
 
       send_request(:get, path, params)
     end
