@@ -319,6 +319,18 @@ module Adapay
       send_request(:get, path, params)
     end
 
+    # 查询余额支付退款终态，支持通过退款单号或原余额支付流水号筛选。
+    def balance_refund_list(params)
+      path = '/v1/settle_accounts/balanceRefundList'
+
+      params = {
+        app_id: app_id,
+        adapay_func_code: 'settle_accounts.balanceRefundList'
+      }.merge(params)
+
+      send_request(:get, path, params)
+    end
+
     # -- 钱包
 
     def cash(params)
